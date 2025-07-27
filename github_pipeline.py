@@ -4,11 +4,6 @@ import dlt
 from dlt.sources.helpers.rest_client import RESTClient
 from dlt.sources.helpers.rest_client.paginators import PageNumberPaginator
 
-os.environ["EXTRACT__WORKERS"] = "4"
-os.environ["NORMALIZE__WORKERS"] = "2"
-os.environ["LOAD__WORKERS"] = "3"
-os.environ["DATA_WRITER__FILE_MAX_ITEMS"] = "1000"
-os.environ["DATA_WRITER__BUFFER_MAX_ITEMS"] = "1000"
 
 def get_client():
     return RESTClient(
@@ -21,12 +16,12 @@ def get_client():
 def jaffle_optimized_source():
     client = get_client()
 
-    @dlt.resource(name="customers", write_disposition="replace", parallelized=True)
+    @dlt.resource(name="customers", write_disposition="replace")
     def customers():
         for page in client.paginate("customers"):
           yield page
 
-    @dlt.resource(name="products", write_disposition="replace", parallelized=True)
+    @dlt.resource(name="products", write_disposition="replace")
     def products():
         for page in client.paginate("products"):
           yield page
@@ -43,10 +38,7 @@ pipeline = dlt.pipeline(
     pipeline_name="jaffle_pipeline",
     destination="duckdb",
     dataset_name="jaffle_shop",
-    dev_mode=True
+    progress="log"
 )
 
-pipeline.extract(jaffle_optimized_source)
-pipeline.normalize()
-pipeline.load()
-print(pipeline.last_trace)
+pipeline.run(jaffle_optimized_source())

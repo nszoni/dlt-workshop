@@ -1,0 +1,2 @@
+# please provide valid dependencies including dlt package
+dlt[duckdb]
