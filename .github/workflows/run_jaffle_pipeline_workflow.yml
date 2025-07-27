@@ -1,7 +1,5 @@
 name: Run jaffle_pipeline pipeline from github_pipeline.py
 'on':
-  schedule:
-  - cron: '*/30 * * * *'
   workflow_dispatch: null
 env: {}
 jobs:
